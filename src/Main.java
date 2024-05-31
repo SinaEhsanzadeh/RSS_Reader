@@ -29,7 +29,7 @@ public class Main {
             urls.add(line);
         bufferedReader.close();
 
-        int input = 0;
+        int input;
 
         while (operationContinue){
             input = scanner.nextInt();
@@ -49,19 +49,20 @@ public class Main {
                 case 2: {
                     System.out.println("Please enter website URL to add:");
                     String newUrl = scanner.nextLine();
-                    for(int i = 0; i < urls.size(); i++){
-                        if (newUrl.equals(urls.get(i))){
+                    int i;
+                    for(i = 0; i < urls.size(); i++){
+                        if (newUrl.equals(urls.get(i))) {
                             System.out.println(urls.get(i) + " already exists.");
-                            break;
-                        }
-                        if ((i == urls.size() - 1) && !newUrl.equals(urls.get(i))){
-
-                            urls.add(newUrl);
-                            System.out.println(newUrl + " added successfully.");
+                            indexList();
                             break;
                         }
                     }
-                    indexList();
+                    if (i == urls.size()){
+                        urls.add(newUrl);
+                        System.out.println(newUrl + " added successfully.");
+                        indexList();
+                        break;
+                    }
                     break;
                 }
 
@@ -87,8 +88,8 @@ public class Main {
                     operationContinue = false;
 
                     BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
-                    for(int i = 0; i <urls.size(); i++){
-                        bufferedWriter.write(urls.get(i) + "\n");
+                    for (String url : urls) {
+                        bufferedWriter.write(url + "\n");
                     }
                     bufferedWriter.close();
                 }
@@ -97,7 +98,7 @@ public class Main {
     }
 
     public static void indexList(){
-        System.out.println("Type a valid answer for your desired answer:");
+        System.out.println("Type a valid number for your desired action:");
         System.out.println("[1] Show updates");
         System.out.println("[2] Add URL");
         System.out.println("[3] Remove URL");
@@ -144,8 +145,7 @@ public class Main {
                     Element element = (Element) itemNode;
                     System.out.println("Title: " + element.getElementsByTagName("title").item(0).getTextContent());
                     System.out.println("Link: " + element.getElementsByTagName("link").item(0).getTextContent());
-                    System.out.println("Description: " + element.getElementsByTagName("description").item(0).
-                            getTextContent());
+                    System.out.println("Description: " + element.getElementsByTagName("description").item(0).getTextContent());
                 }
             }
         }
@@ -158,8 +158,7 @@ public class Main {
     public static void urlChoose(int choice) throws Exception {
         scanner.nextLine();
         if (choice == 0) {
-            for(int i = 0; i < urls.size(); i++)
-                retrieveRssContent(extractRssUrl(fetchPageSource(urls.get(i))));
+            for (String url : urls) retrieveRssContent(extractRssUrl(url));
         }
         else if (choice != -1){
             for (int i = 1; i <= urls.size(); i++)
@@ -170,15 +169,9 @@ public class Main {
 
     }
 
-    public static String extractRssUrl(String url) {
-        try {
+    public static String extractRssUrl (String url)throws IOException {
             org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
             return doc.select("[type='application/rss+xml']").attr("abs:href");
-        }
-        catch (IOException ex){
-            System.out.println("Error extracting RSS URL");
-            return "";
-        }
     }
 
 
